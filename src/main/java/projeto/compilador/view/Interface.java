@@ -3,6 +3,9 @@ package projeto.compilador.view;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.File;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -19,6 +22,7 @@ public class Interface extends JFrame {
 	private JTextArea editorCodigo;
 	private JLabel lblStatusInfo;
 	private JTextArea areaMensagens;
+	private File arquivoAtual = null;
 
 	/**
 	 * Launch the application.
@@ -62,27 +66,43 @@ public class Interface extends JFrame {
 		getContentPane().add(barraFerramentas, BorderLayout.WEST);
 		JButton btnNovo = new JButton("Novo [ctrl-n]");
 		barraFerramentas.add(btnNovo);
+		btnNovo.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnNovo.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnNovo.setIcon(new ImageIcon(getClass().getResource("/projeto/compilador/images/new-document.png")));
 		JButton btnAbrir = new JButton("Abrir [ctrl-o]");
 		barraFerramentas.add(btnAbrir);
+		btnAbrir.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnAbrir.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnAbrir.setIcon(new ImageIcon(getClass().getResource("/projeto/compilador/images/open-folder.png")));
 		JButton btnSalvar = new JButton("Salvar [ctrl-s]");
 		barraFerramentas.add(btnSalvar);
+		btnSalvar.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnSalvar.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnSalvar.setIcon(new ImageIcon(getClass().getResource("/projeto/compilador/images/save.png")));
 		JButton btnCopiar = new JButton("Copiar [ctrl-c]");
 		barraFerramentas.add(btnCopiar);
+		btnCopiar.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnCopiar.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnCopiar.setIcon(new ImageIcon(getClass().getResource("/projeto/compilador/images/copy.png")));
 		JButton btnColar = new JButton("Colar [ctrl-v]");
 		barraFerramentas.add(btnColar);
+		btnColar.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnColar.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnColar.setIcon(new ImageIcon(getClass().getResource("/projeto/compilador/images/paste.png")));
 		JButton btnRecortar = new JButton("Recortar [ctrl-x]");
 		barraFerramentas.add(btnRecortar);
+		btnRecortar.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnRecortar.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnRecortar.setIcon(new ImageIcon(getClass().getResource("/projeto/compilador/images/scissor.png")));
 		JButton btnCompilar = new JButton("Compilar [F7]");
 		barraFerramentas.add(btnCompilar);
+		btnCompilar.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnCompilar.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnCompilar.setIcon(new ImageIcon(getClass().getResource("/projeto/compilador/images/start.png")));
 		JButton btnEquipe = new JButton("Equipe [F1]");
 		barraFerramentas.add(btnEquipe);
+		btnEquipe.setVerticalTextPosition(SwingConstants.BOTTOM);
+		btnEquipe.setHorizontalTextPosition(SwingConstants.CENTER);
 		btnEquipe.setIcon(new ImageIcon(getClass().getResource("/projeto/compilador/images/team.png")));
 	
 		editorCodigo = new JTextArea();
@@ -119,7 +139,7 @@ public class Interface extends JFrame {
 		barraStatus.setBorder(BorderFactory.createEtchedBorder());
 		barraStatus.setBackground(new Color(245, 245, 245));
 
-		lblStatusInfo = new JLabel("  Status: Pronto para compilar.");
+		lblStatusInfo = new JLabel("");
 		lblStatusInfo.setFont(new Font("SansSerif", Font.PLAIN, 11));
 		barraStatus.add(lblStatusInfo, BorderLayout.WEST);
 
@@ -131,7 +151,7 @@ public class Interface extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				editorCodigo.setText("");
 				areaMensagens.setText("");
-				lblStatusInfo.setText("Status: ");
+				lblStatusInfo.setText("");
 			}
 		});
 		KeyStroke keyNew = KeyStroke.getKeyStroke("control N");
@@ -143,21 +163,157 @@ public class Interface extends JFrame {
 			}
 		});
 		
-		btnSalvar.addActionListener(new ActionListener() {
+		btnAbrir.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser();
 				
+				fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Arquivos de Texto (*.txt)", "txt"));
+				
+				int resultado = fileChooser.showOpenDialog(Interface.this);
+				
+				if (resultado == JFileChooser.APPROVE_OPTION) {
+					File arquivoSelecionado = fileChooser.getSelectedFile();
+					
+					try {
+						editorCodigo.read(new java.io.FileReader(arquivoSelecionado), null);
+						
+						arquivoAtual = arquivoSelecionado;
+						
+						areaMensagens.setText("");
+
+						lblStatusInfo.setText(  arquivoAtual.getParentFile().getName()  + "/" + arquivoAtual.getName());
+						
+					} catch (Exception ex) {
+						JOptionPane.showMessageDialog(Interface.this, "Erro ao ler o arquivo: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
+		});
+		KeyStroke KeyAbrir = KeyStroke.getKeyStroke("control O");
+		contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyAbrir, "acaoAbrir");
+		contentPane.getActionMap().put("acaoAbrir", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnAbrir.doClick(); 
 			}
 		});
 		
-		btnAbrir.addActionListener(new ActionListener() {
-			
+		btnSalvar.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-
+				File arquivoParaSalvar = arquivoAtual;
 				
+				if (arquivoParaSalvar == null) {
+					JFileChooser fileChooser = new JFileChooser();
+					fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("Arquivos de Texto (*.txt)", "txt"));
+					
+					int resultado = fileChooser.showSaveDialog(Interface.this);
+					
+					if (resultado == JFileChooser.APPROVE_OPTION) {
+						arquivoParaSalvar = fileChooser.getSelectedFile();
+						
+						if (!arquivoParaSalvar.getName().toLowerCase().endsWith(".txt")) {
+							arquivoParaSalvar = new File(arquivoParaSalvar.getAbsolutePath() + ".txt");
+						}
+					} else {
+						return;
+					}
+				}
+				try (java.io.FileWriter writer = new java.io.FileWriter(arquivoParaSalvar)) {
+					editorCodigo.write(writer);
+					arquivoAtual = arquivoParaSalvar;
+					
+					areaMensagens.setText("");
+					
+					lblStatusInfo.setText(  arquivoAtual.getParentFile().getName() + "/" + arquivoAtual.getName());
+					
+				} catch (Exception ex) {
+					JOptionPane.showMessageDialog(Interface.this, "Erro ao salvar o arquivo: " + ex.getMessage(), "Erro", JOptionPane.ERROR_MESSAGE);
+				}
+			}
+		});
+		KeyStroke KeySalvar = KeyStroke.getKeyStroke("control S");
+		contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeySalvar, "acaoSalvar");
+		contentPane.getActionMap().put("acaoSalvar", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnSalvar.doClick(); 
+			}
+		});
+		
+		btnCopiar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				editorCodigo.copy();
+			}
+		});
+		KeyStroke keyCopiar = KeyStroke.getKeyStroke("control C");
+		contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyCopiar, "acaoCopiar");
+		contentPane.getActionMap().put("acaoCopiar", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnCopiar.doClick(); 
+			}
+		});
+		
+		btnRecortar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				editorCodigo.cut();
+			}
+		});
+		KeyStroke keyRecortar = KeyStroke.getKeyStroke("control X");
+		contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyRecortar, "acaoRecortar");
+		contentPane.getActionMap().put("acaoRecortar", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnRecortar.doClick(); 
+			}
+		});
+		
+		btnColar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				editorCodigo.paste();
+			}
+		});
+		KeyStroke keyColar = KeyStroke.getKeyStroke("control V");
+		contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyColar, "acaoColar");
+		contentPane.getActionMap().put("acaoColar", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnColar.doClick(); 
+			}
+		});
+		
+		btnCompilar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				areaMensagens.setText("");
+				areaMensagens.setText("compilação de programas ainda não foi implementada");
+			}
+		});
+		KeyStroke keyCommpilar = KeyStroke.getKeyStroke("F1");
+		contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyCommpilar, "acaoCompilar");
+		contentPane.getActionMap().put("acaoCompilar", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnCompilar.doClick(); 
+			}
+		});
+		
+		btnEquipe.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				areaMensagens.setText("");
+				areaMensagens.setText("Lucas Edson Machado e Pedro Henrique Comandolli");
+			}
+		});
+		KeyStroke keyEquipe = KeyStroke.getKeyStroke("F7");
+		contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyEquipe, "acaoEquipe");
+		contentPane.getActionMap().put("acaoEquipe", new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				btnEquipe.doClick(); 
 			}
 		});
 	}
 	
-
+	
 }
