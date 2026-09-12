@@ -15,7 +15,7 @@ public class Token
 
     public final int getId()
     {
-        return Constants.t_TOKEN_11;
+        return id;
     }
 
     public final String getLexeme()

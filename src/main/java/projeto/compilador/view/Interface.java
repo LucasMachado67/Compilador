@@ -3,9 +3,9 @@ package projeto.compilador.view;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -13,6 +13,10 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.*;
 import java.awt.*;
 
+import projeto.compilador.classes.Constants;
+import projeto.compilador.classes.LexicalError;
+import projeto.compilador.classes.Lexico;
+import projeto.compilador.classes.Token;
 import projeto.compilador.utils.NumberedBorder;
 
 public class Interface extends JFrame {
@@ -286,8 +290,49 @@ public class Interface extends JFrame {
 		
 		btnCompilar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				// 1 - Apagar o conteúdo da área de mensagens
 				areaMensagens.setText("");
-				areaMensagens.setText("compilação de programas ainda não foi implementada");
+				
+				String codigoFonte = editorCodigo.getText();
+				Lexico lexico = new Lexico();
+				lexico.setInput(codigoFonte);
+
+				List<String> tokensAcumulados = new ArrayList<>();
+				boolean erroOcorrido = false;
+				try {
+					Token t = null;
+					while ( (t = lexico.nextToken()) != null ) {
+				           System.out.println(t.getLexeme()); 
+				           
+				           if (t.getId() == Constants.DOLLAR) {
+				               break;
+				           }
+				           
+				           //2 - Apresentar a lista de tokens
+				           int linha = calcularLinha(codigoFonte, t.getPosition());
+				           String classePorExtenso = obterClassePorExtenso(t.getId());
+				           String linhaFormatada = "Linha " + linha + " | " + classePorExtenso + " | " + t.getLexeme();
+				           tokensAcumulados.add(linhaFormatada);	   
+				      }
+				   }
+				   catch ( LexicalError e1 ) {  // tratamento de erros
+				      System.out.println(e1.getMessage() + " em " + e1.getPosition());
+				 
+				      // e.getMessage() - retorna a mensagem de erro de SCANNER_ERRO (ver ScannerConstants.java)
+				      // necessário adaptar conforme o enunciado da parte 2
+				    
+				      // e.getPosition() - retorna a posição inicial do erro 
+				      // necessário adaptar para mostrar a linha  
+				    } 
+				if (!erroOcorrido) {
+				    StringBuilder sb = new StringBuilder();
+				    
+				    for (String tokenStr : tokensAcumulados) {
+				        sb.append(tokenStr).append("\n");
+				    }
+				    sb.append("\nprograma compilado com sucesso");
+				    areaMensagens.setText(sb.toString());
+				}
 			}
 		});
 		KeyStroke keyCommpilar = KeyStroke.getKeyStroke("F1");
@@ -315,5 +360,57 @@ public class Interface extends JFrame {
 		});
 	}
 	
+	public String obterClassePorExtenso(int id) {
+		
+		//Símbolos especiais
+		if (id >= Constants.t_TOKEN_3 && id <= Constants.t_TOKEN_20) {
+	        return "símbolo especial";
+	    }
+	    switch (id) {
+	    
+	        // Palavras reservadas
+	        case Constants.t_and:
+	        case Constants.t_false:
+	        case Constants.t_if:
+	        case Constants.t_in:
+	        case Constants.t_isFalseDo:
+	        case Constants.t_isTrueDo:
+	        case Constants.t_module:
+	        case Constants.t_not:
+	        case Constants.t_or:
+	        case Constants.t_out:
+	        case Constants.t_true:
+	        case Constants.t_while:
+	        case Constants.t_int:
+	        case Constants.t_float:
+	        case Constants.t_string:
+	        case Constants.t_bool:
+	            return "palavra reservada";
+
+	        // Constantes
+	        case Constants.t_constante_int:
+	            return "constante_int";
+	        case Constants.t_constante_float:
+	            return "constante_float";
+	        case Constants.t_constante_string:
+	            return "constante_string";
+
+	        default:
+	            return "identificador";
+	    }
+	}
 	
+	public int calcularLinha(String textoCompleto, int position) {
+	    if (position < 0 || textoCompleto == null || textoCompleto.isEmpty()) {
+	        return 1;
+	    }
+	    int linha = 1;
+	    int limite = Math.min(position, textoCompleto.length());
+	    for (int i = 0; i < limite; i++) {
+	        if (textoCompleto.charAt(i) == '\n') {
+	            linha++;
+	        }
+	    }
+	    return linha;
+	}
 }

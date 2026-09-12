@@ -22,7 +22,7 @@ public class NumberedBorder extends AbstractBorder {
 
 	private static int lineHeight;
 	private final int characterHeight = 8;
-	private final int characterWidth = 7;
+	private final int characterWidth = 9;
 	private final Color myColor;
 
 	public NumberedBorder() {
