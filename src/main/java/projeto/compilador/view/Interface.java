@@ -457,12 +457,6 @@ public class Interface extends JFrame {
 
 			return "símbolo inválido";
 		}
-
-		/*
-		 * Quando o GALS não fornece uma mensagem específica para o estado
-		 * em que o erro ocorreu, a categoria exigida pelo trabalho é
-		 * "identificador inválido".
-		 */
 		return "identificador inválido";
 	}
 }
