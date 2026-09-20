@@ -310,28 +310,30 @@ public class Interface extends JFrame {
 				           
 				           //2 - Apresentar a lista de tokens
 				           int linha = calcularLinha(codigoFonte, t.getPosition());
+				           if (t.getId() == Constants.t_pr) {
+								erroOcorrido = true;
+								mostrarErro(linha, t.getLexeme() + " palavra reservada inválida");
+								break;
+							}
 				           String classePorExtenso = obterClassePorExtenso(t.getId());
 				           String linhaFormatada = "Linha " + linha + " | " + classePorExtenso + " | " + t.getLexeme();
 				           tokensAcumulados.add(linhaFormatada);	   
 				      }
 				   }
 				   catch ( LexicalError e1 ) {  // tratamento de erros
-				      System.out.println(e1.getMessage() + " em " + e1.getPosition());
-				 
-				      // e.getMessage() - retorna a mensagem de erro de SCANNER_ERRO (ver ScannerConstants.java)
-				      // necessário adaptar conforme o enunciado da parte 2
-				    
-				      // e.getPosition() - retorna a posição inicial do erro 
-				      // necessário adaptar para mostrar a linha  
-				    } 
+				      erroOcorrido = true;
+				      int linha = calcularLinha(codigoFonte, e1.getPosition());
+				      mostrarErro(linha, adaptarMensagemErroLexico(e1, codigoFonte));
+				   } 
 				if (!erroOcorrido) {
-				    StringBuilder sb = new StringBuilder();
-				    
-				    for (String tokenStr : tokensAcumulados) {
-				        sb.append(tokenStr).append("\n");
-				    }
-				    sb.append("\nprograma compilado com sucesso");
-				    areaMensagens.setText(sb.toString());
+					StringBuilder sb = new StringBuilder();
+
+					for (String tokenStr : tokensAcumulados) {
+						sb.append(tokenStr).append("\n");
+					}
+
+					sb.append("\nprograma compilado com sucesso");
+					areaMensagens.setText(sb.toString());
 				}
 			}
 		});
@@ -366,6 +368,10 @@ public class Interface extends JFrame {
 		if (id >= Constants.t_TOKEN_3 && id <= Constants.t_TOKEN_20) {
 	        return "símbolo especial";
 	    }
+		
+		if ((id >= Constants.t_int && id <= Constants.t_bool) || id == Constants.t_pr) {
+			return "identificador";
+		}
 	    switch (id) {
 	    
 	        // Palavras reservadas
@@ -381,10 +387,6 @@ public class Interface extends JFrame {
 	        case Constants.t_out:
 	        case Constants.t_true:
 	        case Constants.t_while:
-	        case Constants.t_int:
-	        case Constants.t_float:
-	        case Constants.t_string:
-	        case Constants.t_bool:
 	            return "palavra reservada";
 
 	        // Constantes
@@ -412,5 +414,55 @@ public class Interface extends JFrame {
 	        }
 	    }
 	    return linha;
+	}
+	
+	private void mostrarErro(int linha, String mensagem) {
+		areaMensagens.setText("linha " + linha + ": " + mensagem);
+	}
+
+	/**
+	 * Converte as mensagens geradas pelo GALS para as mensagens exigidas
+	 * no enunciado da parte 2.
+	 */
+	private String adaptarMensagemErroLexico(LexicalError erro, String codigoFonte) {
+		String mensagem = erro.getMessage() == null ? "" : erro.getMessage();
+
+		if (mensagem.contains("constante_string")) {
+			return "constante _string inválida";
+		}
+		
+		if (mensagem.contains("constante_float")) {
+			return "constante _float inválida";
+		}
+		
+		if (mensagem.contains("constante_int")) {
+			return "constante _int inválida";
+		}
+		
+		if(mensagem.contains("constante_bool")) {
+			return "constante _bool inválida";
+		}
+		
+		if (mensagem.contains("<ignorar>")) {
+			return "comentário inválido ou não finalizado";
+		}
+
+		if (mensagem.contains("Caractere não esperado")) {
+			int posicao = erro.getPosition();
+
+			if (codigoFonte != null && posicao >= 0 && posicao < codigoFonte.length()) {
+				char simbolo = codigoFonte.charAt(posicao);
+				return simbolo + " símbolo inválido";
+			}
+
+			return "símbolo inválido";
+		}
+
+		/*
+		 * Quando o GALS não fornece uma mensagem específica para o estado
+		 * em que o erro ocorreu, a categoria exigida pelo trabalho é
+		 * "identificador inválido".
+		 */
+		return "identificador inválido";
 	}
 }
