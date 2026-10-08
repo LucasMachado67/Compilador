@@ -1,14 +1,11 @@
 package projeto.compilador.view;
 
-import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.*;
 import java.awt.*;
@@ -337,7 +334,7 @@ public class Interface extends JFrame {
 				}
 			}
 		});
-		KeyStroke keyCommpilar = KeyStroke.getKeyStroke("F1");
+		KeyStroke keyCommpilar = KeyStroke.getKeyStroke("F7");
 		contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyCommpilar, "acaoCompilar");
 		contentPane.getActionMap().put("acaoCompilar", new AbstractAction() {
 			@Override
@@ -352,7 +349,7 @@ public class Interface extends JFrame {
 				areaMensagens.setText("Lucas Edson Machado e Pedro Henrique Comandolli");
 			}
 		});
-		KeyStroke keyEquipe = KeyStroke.getKeyStroke("F7");
+		KeyStroke keyEquipe = KeyStroke.getKeyStroke("F1");
 		contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyEquipe, "acaoEquipe");
 		contentPane.getActionMap().put("acaoEquipe", new AbstractAction() {
 			@Override
@@ -363,9 +360,8 @@ public class Interface extends JFrame {
 	}
 	
 	public String obterClassePorExtenso(int id) {
-		
 		//Símbolos especiais
-		if (id >= Constants.t_TOKEN_3 && id <= Constants.t_TOKEN_20) {
+		if (id >= Constants.t_TOKEN_3 && id <= Constants.t_TOKEN_18) {
 	        return "símbolo especial";
 	    }
 		
