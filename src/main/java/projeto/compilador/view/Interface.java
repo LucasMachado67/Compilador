@@ -13,6 +13,10 @@ import java.awt.*;
 import projeto.compilador.classes.Constants;
 import projeto.compilador.classes.LexicalError;
 import projeto.compilador.classes.Lexico;
+import projeto.compilador.classes.SemanticError;
+import projeto.compilador.classes.Semantico;
+import projeto.compilador.classes.Sintatico;
+import projeto.compilador.classes.SyntaticError;
 import projeto.compilador.classes.Token;
 import projeto.compilador.utils.NumberedBorder;
 
@@ -292,36 +296,52 @@ public class Interface extends JFrame {
 				
 				String codigoFonte = editorCodigo.getText();
 				Lexico lexico = new Lexico();
+				Sintatico sintatico = new Sintatico();
+				Semantico semantico = new Semantico();
 				lexico.setInput(codigoFonte);
 
 				List<String> tokensAcumulados = new ArrayList<>();
 				boolean erroOcorrido = false;
 				try {
-					Token t = null;
-					while ( (t = lexico.nextToken()) != null ) {
-				           System.out.println(t.getLexeme()); 
-				           
-				           if (t.getId() == Constants.DOLLAR) {
-				               break;
-				           }
-				           
-				           //2 - Apresentar a lista de tokens
-				           int linha = calcularLinha(codigoFonte, t.getPosition());
-				           if (t.getId() == Constants.t_pr) {
-								erroOcorrido = true;
-								mostrarErro(linha, t.getLexeme() + " palavra reservada inválida");
-								break;
-							}
-				           String classePorExtenso = obterClassePorExtenso(t.getId());
-				           String linhaFormatada = "Linha " + linha + " | " + classePorExtenso + " | " + t.getLexeme();
-				           tokensAcumulados.add(linhaFormatada);	   
-				      }
+//					Token t = null;
+//					while ( (t = lexico.nextToken()) != null ) {
+//				           System.out.println(t.getLexeme()); 
+//				           
+//				           if (t.getId() == Constants.DOLLAR) {
+//				               break;
+//				           }
+//				           
+//				           //2 - Apresentar a lista de tokens
+//				           int linha = calcularLinha(codigoFonte, t.getPosition());
+//				           if (t.getId() == Constants.t_pr) {
+//								erroOcorrido = true;
+//								mostrarErro(linha, t.getLexeme() + " palavra reservada inválida");
+//								break;
+//							}
+//				           String classePorExtenso = obterClassePorExtenso(t.getId());
+//				           String linhaFormatada = "Linha " + linha + " | " + classePorExtenso + " | " + t.getLexeme();
+//				           tokensAcumulados.add(linhaFormatada);	   
+//				      }
+					sintatico.parse(lexico, semantico);
+					
 				   }
 				   catch ( LexicalError e1 ) {  // tratamento de erros
 				      erroOcorrido = true;
 				      int linha = calcularLinha(codigoFonte, e1.getPosition());
-				      mostrarErro(linha, adaptarMensagemErroLexico(e1, codigoFonte));
+				      //mostrarErro(linha, adaptarMensagemErroLexico(e1, codigoFonte));
+				      mostrarErro(linha, "erro léxico");
 				   } 
+				   catch (SyntaticError e2) {
+					   erroOcorrido = true;
+					   System.out.println(e2.getMessage() + " em " + e2.getPosition());
+					   int linha = calcularLinha(codigoFonte, e2.getPosition());
+					   String encontrado = extrairLexemeNaPosicao(codigoFonte, e2.getPosition());
+					   mostrarErro(linha, "encontrado " + encontrado + " " + e2.getMessage());
+					   
+				   } catch (SemanticError e3) {
+					   erroOcorrido = true;
+					   e3.printStackTrace();
+				   }
 				if (!erroOcorrido) {
 					StringBuilder sb = new StringBuilder();
 
@@ -368,6 +388,14 @@ public class Interface extends JFrame {
 		if ((id >= Constants.t_int && id <= Constants.t_bool) || id == Constants.t_pr) {
 			return "identificador";
 		}
+		
+		if ((id >= Constants.DOLLAR)) {
+			return "EOF";
+		}
+		
+		if ((id >= Constants.t_pr)) {
+			return "palavra reservada";
+		}
 	    switch (id) {
 	    
 	        // Palavras reservadas
@@ -395,6 +423,33 @@ public class Interface extends JFrame {
 
 	        default:
 	            return "identificador";
+	    }
+	}
+	
+	private String extrairLexemeNaPosicao(String codigo, int posicao) {
+	    if (posicao < 0 || posicao >= codigo.length()) {
+	        return "EOF";
+	    }  
+	    char c = codigo.charAt(posicao);
+	    if ("(){}[];=+-*/<>".indexOf(c) != -1) {
+	        return String.valueOf(c);
+	    }
+	    int fim = posicao;
+	    while (fim < codigo.length()) {
+	        char atual = codigo.charAt(fim);
+	        if (Character.isWhitespace(atual) || "(){}[];=+-*/<>".indexOf(atual) != -1) {
+	            if ((atual == ',' || atual == '.') && fim + 1 < codigo.length() && Character.isDigit(codigo.charAt(fim + 1))) {
+	                fim++; 
+	                continue;
+	            }
+	            break;
+	        }
+	        fim++;
+	    }
+	    if (codigo.substring(posicao, fim) != ""){	    	
+	    		return codigo.substring(posicao, fim);
+	    }else {
+	    	return "EOF";
 	    }
 	}
 	
