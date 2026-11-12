@@ -1,0 +1,36 @@
+roteiro de aula: IMPLEMENTAÇÃO
+
+1) abrir o arquivo .GALS usado para a implementação do analisador sintático e colocar a numeração das ações semânticas, considerando o esquema de tradução disponível no AVA. É necessário verificar a correspondência entre as regras sintáticas desse esquema com as da gramática especificada pela equipe. 
+
+2) verificar opções (em Ferramentas > Opções): 
+   2.1 aba GERAL: selecionar Analisador Léxico e Sintático, escolher linguagem
+   2.2 aba LÉXICO: selecionar (1) Forma de Entrada: String; (2) Implementação do Autômato: TWTYabela Compactada; (3) Diferenciar maiúsculas/minúsculas ...
+   2.3 aba SINTÁTICO: selecionar Classe do analisador sintático: LL(1)
+
+3) gerar código (em Ferramentas > Gerar Código): escolher pasta, gerar todos os arquivos. 
+
+4) baixar o arquivo Semantico.java disponível no AVA. As ações semânticas são executadas a partir do método executeAction (dessa classe), que recebe como parâmetros (do analisador sintático) o número da ação semântica reconhecida (action) e o token corrente (token).
+
+5) verificar se para o programa abaixo as ações semânticas já implementadas estão corretas:
+    module {
+        out(true, 1)
+    }
+
+O programa deve ser salvo em um arquivo texto. Caso o nome do arquivo seja teste01.txt, ao ser compilado, deve ser gerado um arquivo texto com o nome teste01.il. Testar o código objeto gerado, conforme explicado em aula quando da resolução da lista nº7, para verificar se corresponde ao código fonte.
+
+6) efetuar outros testes para validar as ações semânticas já implementadas.
+
+7) incluir em Semantico.java a implementação dos demais registros semânticos e das demais ações semânticas definidas no esquema de tradução.
+COMO? as informações estão em vários arquivos, todos disponíveis no AVA. Usar como material de consulta: (a) o teste_01.il (no enunciado da parte 4); (b) os códigos fonte e objeto disponibilizados no AVA; (c) o anexo, a lista nº6, a lista nº7 e a lista nº8 disponibilizados no AVA; (d) o trabalho do acadêmico Giancarlo Tomazelli (link disponível no AVA).
+
+8) escrever programas na linguagem fonte 2026.2 e testar se o código objeto gerado corresponde ao código fonte.
+
+SUGESTÃO: ordem de implementação das ações semânticas
+1o) ações: 129, 130, 116, 117, 119, 121, 122
+2o) ações: 103, 104, 106, 108, 127 (considerando que não temos array)
+3o) ações: 110-115
+4o) ações: 105, 107, 134, 106 (ajustar), 108 (ajustar), 127 (ajustar), 133
+
+
+
+

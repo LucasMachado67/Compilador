@@ -116,15 +116,15 @@ constante_string :! \"[^\n\""\"]*\"
 <identificador_expressao>
 <vetor>
 #Grammar
-<programa> ::= module <declaracao_variaveis> "{" <lista_comandos> "}";
-<declaracao_variaveis> ::= <lista_variaveis> | î;
+<programa> ::= module #101 <declaracao_variaveis> "{" <lista_comandos> "}" #102;
 
-<lista_variaveis> ::= <identificador> <resto_variaveis>;
-<resto_variaveis> ::= "," <identificador> <resto_variaveis> | î;
+<declaracao_variaveis> ::= <lista_variaveis> | î;
+<lista_variaveis> ::= <identificador> #103 <resto_variaveis>;
+<resto_variaveis> ::= "," <identificador> #103 <resto_variaveis> | î;
 
 
 <identificador> ::= int <id_opcional> | float <id_opcional> | string <id_opcional> | bool <id_opcional>;
-<id_opcional> ::= î | "[" constante_int "]";
+<id_opcional> ::= #104 î | "[" constante_int #105 "]";
 
 
 <comando> ::= <atribuicao> | <entrada> | <saida> | <selecao> | <repeticao>;
@@ -132,48 +132,48 @@ constante_string :! \"[^\n\""\"]*\"
 <resto_comandos> ::= <comando> <resto_comandos> | î;
 
 <identificador_uso>::= int | float | string | bool ;
-<atribuicao> ::= <identificador_uso> <resto_atribuicao>;
-<resto_atribuicao> ::= "<-" <expressao> | "[" <expressao> "]" "<-" <expressao>;
+<atribuicao> ::= <identificador_uso> #103 <resto_atribuicao>;
+<resto_atribuicao> ::= "<-" <expressao>  #106 | #107 "[" <expressao> "]" #134 #103 "<-" <expressao> #106;
 
 <entrada> ::= in "(" <lista_identificadores> ")"; 
 <lista_identificadores> ::= <id_exp> <resto_identificadores>;
 <resto_identificadores> ::= "," <id_exp> <resto_identificadores> | î;
 
-<id_exp> ::= <identificador_uso> <resto_id_exp>;
-<resto_id_exp> ::= "[" <expressao> "]" | î;
+<id_exp> ::= <identificador_uso> #103 <resto_id_exp>;
+<resto_id_exp> ::= #107 "[" <expressao> "]" #134 #108 | î;
 
 
 <saida> ::= out "(" <lista_expressoes> ")";
-<lista_expressoes> ::= <expressao> <resto_expressoes>;
+<lista_expressoes> ::= <expressao> #109 <resto_expressoes>;
 <resto_expressoes> ::= "," <lista_expressoes> | î;
 
 <selecao> ::= if "(" <expressao> ")" <ramo_selecao>;
-<ramo_selecao> ::= isTrueDo "{" <lista_comandos> "}" <opcional_false> | isFalseDo "{" <lista_comandos> "}" <opcional_true>;
-<opcional_false> ::=  isFalseDo "{" <lista_comandos> "}" | î;
-<opcional_true> ::= isTrueDo "{" <lista_comandos> "}" | î;
+<ramo_selecao> ::= isTrueDo #110 "{" <lista_comandos> "}" <opcional_false>  #111 | isFalseDo #110 "{" <lista_comandos> "}" <opcional_true>  #111;
+<opcional_false> ::=  isFalseDo #112  "{" <lista_comandos> "}" | î;
+<opcional_true> ::= isTrueDo #112 "{" <lista_comandos> "}" | î;
  
-<repeticao> ::= while "(" <expressao> ")" <tipo_repeticao>;
-<tipo_repeticao> ::= isTrueDo "{" <lista_comandos> "}" | isFalseDo "{" <lista_comandos> "}";
+<repeticao> ::= #113 while "(" <expressao> ")" <tipo_repeticao>;
+<tipo_repeticao> ::= isTrueDo #114 "{" <lista_comandos> "}" | isFalseDo #114 "{" <lista_comandos> "}" #115;
 
 
 <expressao> ::= <termo_logico> <expressao_> ;
-<expressao_> ::= î | and <termo_logico> <expressao_> | or <termo_logico> <expressao_> ;
-<termo_logico> ::= <relacional> | true | false | not <termo_logico> ;
+<expressao_> ::= î | and <termo_logico> #116 <expressao_> | or <termo_logico>  #117 <expressao_> ;
+<termo_logico> ::= <relacional> | true #118 | false  #119 | not <termo_logico>  #120 ;
 <relacional> ::= <aritmetica> <relacional_> ;
-<relacional_> ::= î | <operador_relacional> <aritmetica> ;
+<relacional_> ::= î | <operador_relacional>  #121 <aritmetica>  #122 ;
 <operador_relacional>::= "=" | "<>" | "<" | ">" ;
 <aritmetica> ::= <termo_aritmetico> <aritmetica_> ;
-<aritmetica_> ::= î | "+" <termo_aritmetico> <aritmetica_> |
- "-" <termo_aritmetico> <aritmetica_> ;
+<aritmetica_> ::= î | "+" <termo_aritmetico> #123 <aritmetica_> |
+ "-" <termo_aritmetico>  #124 <aritmetica_> ;
 <termo_aritmetico> ::= <fator> <termo_aritmetico_> ;
-<termo_aritmetico_> ::= î | "*" <fator> <termo_aritmetico_> | "/" <fator> <termo_aritmetico_> ;
-<fator> ::= <identificador_expressao> <vetor> |
- constante_int |
- constante_float |
- constante_string |
+<termo_aritmetico_> ::= î | "*" <fator> #125 <termo_aritmetico_> | "/" <fator> #126 <termo_aritmetico_> ;
+<fator> ::= <identificador_expressao> #127 <vetor> |
+ constante_int #128|
+ constante_float #129|
+ constante_string #130|
  "(" <expressao> ")" |
- "+" <fator> |
- "-" <fator> ;
+ "+" <fator> #131|
+ "-" <fator> #132;
 <identificador_expressao>::= int | float | string | bool;
-<vetor> ::= î | "[" <expressao> "]" ; 
+<vetor> ::= î | "[" <expressao> "]" #133; 
 
